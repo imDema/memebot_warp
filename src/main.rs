@@ -7,20 +7,22 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let conn_pool = memebot_backend::establish_connection_pool();
 
     let cp = conn_pool.clone();
-    let new_user = warp::path!("new_user")
-        .and(warp::body::content_length_limit(4 * 1024))
+    let new_action = warp::path!("action" / "new")
+        .and(warp::body::content_length_limit(1024))
         .and(warp::body::json())
-        .and_then(move |user: NewUser| {
+        .and_then(move |action: NewAction| {
             let conn = cp.clone().get().unwrap();
             async move {
-            memebot_backend::create_user(&conn, user)
+            memebot_backend::new_action(&conn, action)
                 .map(|()| warp::reply())
                 .map_err(|_why| warp::reject::reject())
             }
         });
-    
+
+    let memes = warp::path("memes");
+
     let cp = conn_pool.clone();
-    let new_meme = warp::path!("new_meme")
+    let new_meme = memes.and(warp::path("new"))
         .and(warp::body::content_length_limit(4 * 1024))
         .and(warp::body::json())
         .and_then(move |meme: NewMeme| {
@@ -33,28 +35,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         });
 
     let cp = conn_pool.clone();
-    let new_action = warp::path("new_action")
-        .and(warp::body::content_length_limit(1024))
-        .and(warp::body::json())
-        .and_then(move |action: NewAction| {
-            let conn = cp.clone().get().unwrap();
-            async move {
-            memebot_backend::new_action(&conn, action)
-                .map(|()| warp::reply())
-                .map_err(|_why| warp::reject::reject())
-            }
-        });
-
-    let cp = conn_pool.clone();
-    let all = warp::path("all")
+    let memes_all = memes
+        .and(warp::path("all"))
         .map(move || {
             let conn = cp.clone().get().unwrap();
-            let coso = AllTest::new(memebot_backend::all_users(&conn).unwrap(), memebot_backend::all_memes(&conn).unwrap());
-            warp::reply::json(&coso)
+            let memes = memebot_backend::all_memes(&conn).unwrap();
+            warp::reply::json(&memes)
         });
 
-    let memes = warp::path("memes");
-
+        
     let cp = conn_pool.clone();
     let memes_user = memes.and(warp::path("user"))
         .and(warp::path::param())
@@ -73,6 +62,29 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             warp::reply::json(&memes)
         });
 
+    let users = warp::path("users");
+        
+    let cp = conn_pool.clone();
+    let new_user = users.and(warp::path("new"))
+        .and(warp::body::content_length_limit(4 * 1024))
+        .and(warp::body::json())
+        .and_then(move |user: NewUser| {
+            let conn = cp.clone().get().unwrap();
+            async move {
+            memebot_backend::create_user(&conn, user)
+                .map(|()| warp::reply())
+                .map_err(|_why| warp::reject::reject())
+            }
+        });
+
+    let cp = conn_pool.clone();
+    let users_all = users.and(warp::path("all"))
+        .map(move ||{
+            let conn = cp.clone().get().unwrap();
+            let users = memebot_backend::all_users(&conn).unwrap();
+            warp::reply::json(&users)
+        });
+
     let routes = warp::post()
         .and( //POST
             new_user
@@ -80,9 +92,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .or(new_action)
         )
         .or( //GET
-            all
+            memes_all
             .or(memes_tag)
             .or(memes_user)
+            .or(users_all)
         );
 
     warp::serve(routes)

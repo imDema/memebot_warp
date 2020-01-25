@@ -1,0 +1,328 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "0.1",
+    "title": "memebot_warp"
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:3030",
+      "description": "Loopback server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Meme"
+    },
+    {
+      "name": "User"
+    },
+    {
+      "name": "Action"
+    }
+  ],
+  "paths": {
+    "/memes/new": {
+      "post": {
+        "summary": "Add new meme",
+        "tags": [
+          "Meme"
+        ],
+        "requestBody": {
+          "description": "Optional description in *Markdown*",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "authorid": {
+                    "type": "integer",
+                    "format": "int32",
+                    "example": 374865387
+                  },
+                  "image": {
+                    "type": "string",
+                    "example": "acb234234.jpg"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "TODO"
+          }
+        }
+      }
+    },
+    "/memes/all": {
+      "get": {
+        "summary": "Returns all memes.",
+        "tags": [
+          "Meme"
+        ],
+        "responses": {
+          "200": {
+            "description": "A JSON array of memes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Meme"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/memes/user/{userid}": {
+      "get": {
+        "summary": "Get all memes posted by user with id {userid}",
+        "tags": [
+          "Meme"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userid",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A JSON array of memes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Meme"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/memes/user/{tagid}": {
+      "get": {
+        "summary": "Get all memes under tag with id {tagid}",
+        "tags": [
+          "Meme"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tagid",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A JSON array of memes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Meme"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/new": {
+      "post": {
+        "summary": "Add new user",
+        "tags": [
+          "User"
+        ],
+        "requestBody": {
+          "description": "Optional description in *Markdown*",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userid": {
+                    "type": "integer",
+                    "format": "int32",
+                    "example": 123456
+                  },
+                  "username": {
+                    "type": "string",
+                    "example": "mango"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "TODO"
+          }
+        }
+      }
+    },
+    "/users/all": {
+      "get": {
+        "summary": "Returns all users.",
+        "tags": [
+          "User"
+        ],
+        "responses": {
+          "200": {
+            "description": "A JSON array of users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/action/new": {
+      "post": {
+        "summary": "Add upvote or downvote",
+        "tags": [
+          "Action"
+        ],
+        "requestBody": {
+          "description": "Optional description in *Markdown*",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "memeid": {
+                    "type": "integer",
+                    "format": "int32",
+                    "example": 7
+                  },
+                  "userid": {
+                    "type": "integer",
+                    "format": "int32",
+                    "example": 123456
+                  },
+                  "is_upvote": {
+                    "type": "boolean",
+                    "example": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "TODO"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Meme": {
+        "type": "object",
+        "properties": {
+          "memeid": {
+            "type": "integer",
+            "format": "int32",
+            "example": 7
+          },
+          "authorid": {
+            "type": "integer",
+            "format": "int32",
+            "example": 374865387
+          },
+          "image": {
+            "type": "string",
+            "example": "acb234234.jpg"
+          },
+          "upvote": {
+            "type": "integer",
+            "format": "int32",
+            "example": 9
+          },
+          "downvote": {
+            "type": "integer",
+            "format": "int32",
+            "example": 2
+          },
+          "score": {
+            "type": "number",
+            "format": "float32",
+            "example": 0.7564392
+          },
+          "heat": {
+            "type": "number",
+            "format": "float32",
+            "example": 16.34567
+          },
+          "last_action": {
+            "type": "string",
+            "example": "2020-01-24T18:58:27.578121"
+          },
+          "posted_at": {
+            "type": "string",
+            "example": "2020-01-21T13:22:13.5633453"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "userid": {
+            "type": "integer",
+            "format": "int32",
+            "example": 123456
+          },
+          "username": {
+            "type": "string",
+            "example": "mango"
+          },
+          "userupvote": {
+            "type": "integer",
+            "format": "int32",
+            "example": 9
+          },
+          "userdownvote": {
+            "type": "integer",
+            "format": "int32",
+            "example": 2
+          },
+          "userscore": {
+            "type": "number",
+            "format": "float32",
+            "example": 0.7564392
+          }
+        }
+      }
+    }
+  }
+}
