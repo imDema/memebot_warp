@@ -10,3 +10,7 @@ edition = "2018"
 warp = "0.2"
 tokio = {version = "0.2", features =  [ "macros" ] }
 memebot_backend = { path = "../memebot_backend" }
+
+[[bin]]
+name = "memebot_warp"
+path = "src/main.rs"
