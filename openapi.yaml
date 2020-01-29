@@ -8,7 +8,6 @@ servers:
 tags:
   - name: Meme
   - name: User
-  - name: Action
 paths:
   /memes/new:
     post:
@@ -31,7 +30,7 @@ paths:
                   type: string
                   example: acb234234.jpg
       responses:
-        '200':
+        '201':
           description: TODO
   /memes/all:
     get:
@@ -67,7 +66,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Meme'
-  '/memes/user/{tagid}':
+  '/memes/tag/{tagid}':
     get:
       summary: 'Get all memes under tag with id {tagid}'
       tags:
@@ -87,6 +86,29 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Meme'
+  /memes/add_tag:
+    post:
+      summary: Add a tag to a meme
+      tags:
+        - Meme
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                memeid:
+                  type: integer
+                  format: int32
+                  example: 34
+                tagid:
+                  type: integer
+                  format: int32
+                  example: 16
+      responses:
+        '201':
+          description: Added
   /users/new:
     post:
       summary: Add new user
@@ -108,7 +130,7 @@ paths:
                   type: string
                   example: mango
       responses:
-        '200':
+        '201':
           description: TODO
   /users/all:
     get:
@@ -124,11 +146,21 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/User'
+  '/tags/new/{tagname}':
+    post:
+      summary: Add new tag
+      parameters:
+        - in: path
+          name: tagname
+          schema:
+            type: string
+          required: true
+      responses:
+        '201':
+          description: TODO
   /action/new:
     post:
       summary: Add upvote or downvote
-      tags:
-        - Action
       requestBody:
         description: Optional description in *Markdown*
         required: true
@@ -149,7 +181,7 @@ paths:
                   type: boolean
                   example: true
       responses:
-        '200':
+        '201':
           description: TODO
 components:
   schemas:
