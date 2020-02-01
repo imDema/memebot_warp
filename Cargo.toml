@@ -11,6 +11,9 @@ warp = "0.2"
 tokio = {version = "0.2", features =  [ "macros" ] }
 memebot_backend = { path = "../memebot_backend" }
 
+[profile.release]
+lto = true
+
 [[bin]]
 name = "memebot_warp"
 path = "src/main.rs"

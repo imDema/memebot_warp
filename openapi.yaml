@@ -8,8 +8,9 @@ servers:
 tags:
   - name: Meme
   - name: User
+  - name: Tag
 paths:
-  /memes/new:
+  /api/v1/meme/new:
     post:
       summary: Add new meme
       tags:
@@ -32,21 +33,7 @@ paths:
       responses:
         '201':
           description: TODO
-  /memes/all:
-    get:
-      summary: Returns all memes.
-      tags:
-        - Meme
-      responses:
-        '200':
-          description: A JSON array of memes
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Meme'
-  '/memes/user/{userid}':
+  '/api/v1/meme/user/{userid}':
     get:
       summary: 'Get all memes posted by user with id {userid}'
       tags:
@@ -66,7 +53,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Meme'
-  '/memes/tag/{tagid}':
+  '/api/v1/meme/tag/{tagid}':
     get:
       summary: 'Get all memes under tag with id {tagid}'
       tags:
@@ -86,7 +73,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Meme'
-  /memes/add_tag:
+  /api/v1/meme/add_tag:
     post:
       summary: Add a tag to a meme
       tags:
@@ -109,58 +96,11 @@ paths:
       responses:
         '201':
           description: Added
-  /users/new:
-    post:
-      summary: Add new user
-      tags:
-        - User
-      requestBody:
-        description: Optional description in *Markdown*
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                userid:
-                  type: integer
-                  format: int32
-                  example: 123456
-                username:
-                  type: string
-                  example: mango
-      responses:
-        '201':
-          description: TODO
-  /users/all:
-    get:
-      summary: Returns all users.
-      tags:
-        - User
-      responses:
-        '200':
-          description: A JSON array of users
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/User'
-  '/tags/new/{tagname}':
-    post:
-      summary: Add new tag
-      parameters:
-        - in: path
-          name: tagname
-          schema:
-            type: string
-          required: true
-      responses:
-        '201':
-          description: TODO
-  /action/new:
+  /api/v1/meme/action:
     post:
       summary: Add upvote or downvote
+      tags:
+        - Meme
       requestBody:
         description: Optional description in *Markdown*
         required: true
@@ -183,6 +123,85 @@ paths:
       responses:
         '201':
           description: TODO
+  /api/v1/meme/all:
+    get:
+      summary: Returns all memes.
+      tags:
+        - Meme
+      responses:
+        '200':
+          description: A JSON array of memes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Meme'
+  /api/v1/user/new:
+    post:
+      summary: Add new user
+      tags:
+        - User
+      requestBody:
+        description: Optional description in *Markdown*
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userid:
+                  type: integer
+                  format: int32
+                  example: 123456
+                username:
+                  type: string
+                  example: mango
+      responses:
+        '201':
+          description: TODO
+  /api/v1/user/all:
+    get:
+      summary: Returns all users.
+      tags:
+        - User
+      responses:
+        '200':
+          description: A JSON array of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+  '/api/v1/tag/new/{tagname}':
+    post:
+      summary: Add new tag
+      tags:
+        - Tag
+      parameters:
+        - in: path
+          name: tagname
+          schema:
+            type: string
+          required: true
+      responses:
+        '201':
+          description: TODO
+  /api/v1/tag/all:
+    get:
+      summary: Returns all tags.
+      tags:
+        - Tag
+      responses:
+        '200':
+          description: A JSON array of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
 components:
   schemas:
     Meme:

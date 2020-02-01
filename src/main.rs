@@ -1,6 +1,7 @@
 use warp::{self, Filter, path};
 use memebot_backend::models::*;
 
+mod routes;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -19,12 +20,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         });
 
-    let memes = path("memes");
-
     let cp = conn_pool.clone();
-    let new_meme = memes.and(path("new"))
-        .and(warp::body::content_length_limit(4 * 1024))
-        .and(warp::body::json())
+    let new_meme = routes::meme_routes::new_meme()
         .and_then(move |meme: NewMeme| {
             let conn = cp.clone().get().unwrap();
             async move {
@@ -35,8 +32,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         });
 
     let cp = conn_pool.clone();
-    let tag_meme = memes.and(path("add_tag"))
-        .and(warp::body::json())
+    let tag_meme = routes::meme_routes::add_tag()
         .and_then(move |meme_tag: MemeTag| {
             let conn = cp.clone().get().unwrap();
             async move {
@@ -47,8 +43,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         });
 
     let cp = conn_pool.clone();
-    let memes_all = memes
-        .and(path("all"))
+    let memes_all = routes::meme_routes::get_all()
         .map(move || {
             let conn = cp.clone().get().unwrap();
             let memes = memebot_backend::all_memes(&conn).unwrap();
@@ -57,8 +52,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         
     let cp = conn_pool.clone();
-    let memes_user = memes.and(path("user"))
-        .and(path::param())
+    let memes_user = routes::meme_routes::by_user()
         .map(move |userid: i32| {
             let conn = cp.clone().get().unwrap();
             let memes = memebot_backend::memes_by_userid(&conn, userid).unwrap();
@@ -66,20 +60,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         });
 
     let cp = conn_pool.clone();
-    let memes_tag = memes.and(path("tag"))
-        .and(path::param())
+    let memes_tag = routes::meme_routes::by_tag()
         .map(move |tagid: i32| {
             let conn = cp.clone().get().unwrap();
             let memes = memebot_backend::memes_by_tagid(&conn, tagid).unwrap();
             warp::reply::json(&memes)
         });
 
-    let users = path("users");
-        
     let cp = conn_pool.clone();
-    let new_user = users.and(path("new"))
-        .and(warp::body::content_length_limit(4 * 1024))
-        .and(warp::body::json())
+    let new_user = routes::user_routes::new_user()
         .and_then(move |user: NewUser| {
             let conn = cp.clone().get().unwrap();
             async move {
@@ -90,18 +79,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         });
 
     let cp = conn_pool.clone();
-    let users_all = users.and(path("all"))
+    let users_all = routes::user_routes::get_all()
         .map(move ||{
             let conn = cp.clone().get().unwrap();
             let users = memebot_backend::all_users(&conn).unwrap();
             warp::reply::json(&users)
         });
 
-    let tags = path("tags");
-
     let cp = conn_pool.clone();
-    let new_tag = tags.and(path("new"))
-        .and(path::param())
+    let new_tag = routes::tag_routes::new_tag()
         .and_then(move |name: String| {
             let conn = cp.clone().get().unwrap();
             async move {
@@ -111,21 +97,25 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         });
 
+    let cp = conn_pool.clone();
+    let tags_all = routes::tag_routes::get_all()
+    .map(move || {
+        let conn = cp.clone().get().unwrap();
+        let tags = memebot_backend::all_tags(&conn).unwrap();
+        warp::reply::json(&tags)
+    });
 
-    let routes = warp::post()
-        .and( //POST
+    let routes =
             new_user
             .or(new_meme)
             .or(new_action)
             .or(new_tag)
             .or(tag_meme)
-        )
-        .or( //GET
-            memes_all
+            .or(memes_all)
             .or(memes_tag)
             .or(memes_user)
             .or(users_all)
-        );
+            .or(tags_all);
 
     warp::serve(routes)
         .run(([127, 0, 0, 1], 3030)).await;
