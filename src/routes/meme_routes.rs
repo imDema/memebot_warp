@@ -1,5 +1,6 @@
 use warp::{filters::BoxedFilter,Filter,path};
 use memebot_backend::models::*;
+use crate::json_body;
 
 fn path_prefix() -> BoxedFilter<()> {
     path!("api" / "v1" / "meme" / ..)
@@ -10,8 +11,7 @@ pub fn new_meme() -> BoxedFilter<(NewMeme, )> {
     warp::post()
         .and(path_prefix())
         .and(path("new"))
-        .and(warp::body::content_length_limit(4 * 1024))
-        .and(warp::body::json())
+        .and(json_body!())
         .boxed()
 }
 
@@ -19,8 +19,7 @@ pub fn add_tag() -> BoxedFilter<(MemeTag, )> {
     warp::post()
     .and(path_prefix())
     .and(path("add_tag"))
-    .and(warp::body::content_length_limit(4 * 1024))
-    .and(warp::body::json())
+    .and(json_body!())
     .boxed()
 }
 
@@ -51,6 +50,6 @@ pub fn action() -> BoxedFilter::<(NewAction, )> {
     warp::post()
         .and(path_prefix())
         .and(path("action"))
-        .and(warp::body::json())
+        .and(json_body!())
         .boxed()
 }

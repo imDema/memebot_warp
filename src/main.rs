@@ -2,6 +2,7 @@ use warp::{self, Filter, path};
 use memebot_backend::models::*;
 
 mod routes;
+mod handlers;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -69,14 +70,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let cp = conn_pool.clone();
     let new_user = routes::user_routes::new_user()
-        .and_then(move |user: NewUser| {
-            let conn = cp.clone().get().unwrap();
-            async move {
-            memebot_backend::create_user(&conn, user)
-                .map(|()| reply_with_status(StatusCode::Created))
-                .map_err(|_why| warp::reject::reject())
-            }
-        });
+        .and_then(handlers::user_handlers::new_user);
 
     let cp = conn_pool.clone();
     let users_all = routes::user_routes::get_all()
@@ -117,29 +111,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .or(users_all)
             .or(tags_all);
 
-    warp::serve(routes)
+    let end = routes.with(warp::log("api"));
+
+    warp::serve(end)
         .run(([127, 0, 0, 1], 3030)).await;
 
     Ok(())
-}
-
-
-enum StatusCode {
-    ServerError,
-    Created,
-    Ok,
-}
-
-#[inline]
-fn reply_with_status(sc: StatusCode) -> impl warp::reply::Reply {
-    use warp::http::StatusCode as WarpCode;
-    let rep = warp::reply();
-
-    let proper_status_code = match sc {
-        StatusCode::ServerError => WarpCode::INTERNAL_SERVER_ERROR,
-        StatusCode::Created => WarpCode::CREATED,
-        StatusCode::Ok => WarpCode::OK,
-    };
-
-    warp::reply::with_status(rep, proper_status_code)
 }
