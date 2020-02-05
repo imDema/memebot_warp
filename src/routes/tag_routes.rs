@@ -1,5 +1,4 @@
 use warp::{filters::BoxedFilter,Filter,path};
-use memebot_backend::models::*;
 
 fn path_prefix() -> BoxedFilter<()> {
     path!("api" / "v1" / "tag" / ..)
