@@ -53,6 +53,35 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Meme'
+  '/api/v1/meme/user/{userid}/order/{by}':
+    get:
+      summary: 'Get all memes posted by user with id {userid}'
+      tags:
+        - Meme
+      parameters:
+        - in: path
+          name: userid
+          schema:
+            type: integer
+          required: true
+        - in: path
+          name: by
+          schema:
+            type: string
+            enum:
+              - score
+              - heat
+              - date
+          required: true
+      responses:
+        '200':
+          description: A JSON array of memes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Meme'
   '/api/v1/meme/tag/{tagid}':
     get:
       summary: 'Get all memes under tag with id {tagid}'
@@ -63,6 +92,35 @@ paths:
           name: tagid
           schema:
             type: integer
+          required: true
+      responses:
+        '200':
+          description: A JSON array of memes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Meme'
+  '/api/v1/meme/tag/{tagid}/order/{by}':
+    get:
+      summary: 'Get all memes under tag with id {tagid}'
+      tags:
+        - Meme
+      parameters:
+        - in: path
+          name: tagid
+          schema:
+            type: integer
+          required: true
+        - in: path
+          name: by
+          schema:
+            type: string
+            enum:
+              - score
+              - heat
+              - date
           required: true
       responses:
         '200':
@@ -128,6 +186,30 @@ paths:
       summary: Returns all memes.
       tags:
         - Meme
+      responses:
+        '200':
+          description: A JSON array of memes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Meme'
+  /api/v1/meme/all/order/{by}:
+    get:
+      summary: Returns all memes.
+      tags:
+        - Meme
+      parameters:
+        - in: path
+          name: by
+          schema:
+            type: string
+            enum:
+              - score
+              - heat
+              - date
+          required: true
       responses:
         '200':
           description: A JSON array of memes
